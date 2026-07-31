@@ -68,7 +68,7 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
             .Select(result =>
             {
                 return new Comic(
-                    Id: result.Id.ToString(),
+                    Id: EncodeComicId(result.Id, result.Slug),
                     ComicUrl: null,
                     Slug: null,
                     Title: result.Title,
@@ -190,6 +190,24 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0"
         );
     }
+
+    private static string EncodeComicId(int id, string slug) => $"{id}:{slug}";
+
+    private static (string, string) DecodeComicId(string encodedId)
+    {
+        var splitted = encodedId.Split(":");
+        return (splitted[0], splitted[1]);
+    }
+
+    private static ComicStatus GetComicStatus(string? status) =>
+        status switch
+        {
+            "completed" => ComicStatus.Completed,
+            "ongoing" => ComicStatus.Ongoing,
+            "hiatus" => ComicStatus.Hiatus,
+            "cancelled" => ComicStatus.Cancelled,
+            _ => ComicStatus.Unknown,
+        };
 
     private static string ToQueryString(Dictionary<string, string[]> source) =>
         string.Join(
