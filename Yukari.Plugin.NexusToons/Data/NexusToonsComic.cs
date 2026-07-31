@@ -8,7 +8,7 @@ internal record NexusToonsComic(
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("author")] string Author,
     [property: JsonPropertyName("description")] string Description,
-    [property: JsonPropertyName("categories")] Category[] categories,
+    [property: JsonPropertyName("categories")] Category[] Categories,
     [property: JsonPropertyName("releaseYear")] int? Year,
     [property: JsonPropertyName("coverImage")] string CoverUrl,
     [property: JsonPropertyName("status")] string Status
