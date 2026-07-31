@@ -6,5 +6,6 @@ internal record NexusToonsChapter(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("number")] string Number,
-    [property: JsonPropertyName("createdAt")] DateTimeOffset CreatedAt
+    [property: JsonPropertyName("createdAt")] DateTimeOffset CreatedAt,
+    [property: JsonPropertyName("pages")] Page[] Pages
 );
