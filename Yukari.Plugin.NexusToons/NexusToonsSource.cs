@@ -91,7 +91,13 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
         CancellationToken ct = default
     )
     {
-        throw new NotImplementedException();
+        var trendingFilters = new Dictionary<string, IReadOnlyList<string>>(filters)
+        {
+            ["sortBy"] = ["views"],
+            ["sortOrder"] = ["desc"],
+        };
+
+        return await SearchAsync(string.Empty, trendingFilters, page, ct);
     }
 
     public async Task<Comic?> GetDetailsAsync(string comicId, CancellationToken ct = default)
