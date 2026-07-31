@@ -23,7 +23,120 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
     private static IReadOnlyList<Filter>? _filters;
     private static IReadOnlyDictionary<string, string>? _languages;
 
-    public IReadOnlyList<Filter> Filters => _filters ??= [];
+    public IReadOnlyList<Filter> Filters =>
+        _filters ??= [
+            new Filter(
+                Key: "includeNsfw",
+                DisplayName: "Conteúdo Adulto",
+                [
+                    new FilterOption("false", "Ocultar", true),
+                    new FilterOption("true", "Incluir", false),
+                ],
+                AllowMultiple: false
+            ),
+            new Filter(
+                Key: "type",
+                DisplayName: "Tipo",
+                [
+                    new FilterOption("manga", "Manga", false),
+                    new FilterOption("manhwa", "Manhwa", false),
+                    new FilterOption("manhua", "Manhua", false),
+                    new FilterOption("webtoon", "Webtoon", false),
+                    new FilterOption("pornhwa", "Pornhwa", false),
+                    new FilterOption("hentai", "Hentai", false),
+                    new FilterOption("doujinshi", "Doujinshi", false),
+                    new FilterOption("novel", "Novel", false),
+                    new FilterOption("one-shot", "One-Shot", false),
+                ],
+                AllowMultiple: true
+            ),
+            new Filter(
+                Key: "status",
+                DisplayName: "Status",
+                [
+                    new FilterOption("ongoing", "Em Andamento", false),
+                    new FilterOption("completed", "Completo", false),
+                    new FilterOption("hiatus", "Hiato", false),
+                    new FilterOption("cancelled", "Cancelado", false),
+                ],
+                AllowMultiple: true
+            ),
+            new Filter(
+                Key: "genres",
+                DisplayName: "Gêneros",
+                [
+                    new FilterOption("56", "Acadêmica", false),
+                    new FilterOption("288", "Adaptação", false),
+                    new FilterOption("145", "Adaptação de Novel", false),
+                    new FilterOption("79", "App", false),
+                    new FilterOption("7", "Aventura", false),
+                    new FilterOption("2", "Ação", false),
+                    new FilterOption("85", "Cartoon", false),
+                    new FilterOption("34", "Club", false),
+                    new FilterOption("66", "Comida", false),
+                    new FilterOption("11", "Comédia", false),
+                    new FilterOption("89", "Crime", false),
+                    new FilterOption("43", "Culinária", false),
+                    new FilterOption("194", "Curta", false),
+                    new FilterOption("41", "Cyberpunk", false),
+                    new FilterOption("191", "Doujinshi", false),
+                    new FilterOption("12", "Drama", false),
+                    new FilterOption("24", "Esportes", false),
+                    new FilterOption("116", "Estratégia", false),
+                    new FilterOption("144", "Estudante", false),
+                    new FilterOption("275", "Familia", false),
+                    new FilterOption("69", "Família", false),
+                    new FilterOption("8", "Fantasia", false),
+                    new FilterOption("332", "Ficção", false),
+                    new FilterOption("16", "Ficção Científica", false),
+                    new FilterOption("235", "Game", false),
+                    new FilterOption("46", "Guerra", false),
+                    new FilterOption("132", "Gênio", false),
+                    new FilterOption("17", "Histórico", false),
+                    new FilterOption("6", "Josei", false),
+                    new FilterOption("70", "Magia", false),
+                    new FilterOption("39", "Mecha", false),
+                    new FilterOption("50", "Metaverso", false),
+                    new FilterOption("45", "Militar", false),
+                    new FilterOption("13", "Mistério", false),
+                    new FilterOption("58", "Mitologia", false),
+                    new FilterOption("148", "Musical", false),
+                    new FilterOption("98", "Médico", false),
+                    new FilterOption("42", "Música", false),
+                    new FilterOption("278", "Nerd", false),
+                    new FilterOption("170", "Oneshot", false),
+                    new FilterOption("160", "Policial", false),
+                    new FilterOption("129", "Polícia", false),
+                    new FilterOption("63", "Psicológico", false),
+                    new FilterOption("217", "Psicopata", false),
+                    new FilterOption("183", "Realismo", false),
+                    new FilterOption("10", "Romance", false),
+                    new FilterOption("336", "Samurai", false),
+                    new FilterOption("296", "Sangue", false),
+                    new FilterOption("5", "Seinen", false),
+                    new FilterOption("4", "Shoujo", false),
+                    new FilterOption("3", "Shounen", false),
+                    new FilterOption("161", "Sombrio", false),
+                    new FilterOption("105", "Supernatural", false),
+                    new FilterOption("14", "Suspense", false),
+                    new FilterOption("159", "Tecnológico", false),
+                    new FilterOption("136", "Terror", false),
+                    new FilterOption("338", "Traduzida por IA", false),
+                    new FilterOption("86", "Tragédia", false),
+                    new FilterOption("147", "Violência", false),
+                    new FilterOption("240", "Webcomic", false),
+                    new FilterOption("77", "campus", false),
+                    new FilterOption("107", "fantasia", false),
+                    new FilterOption("111", "luta", false),
+                    new FilterOption("108", "sistema", false),
+                    new FilterOption("60", "sobrenatural", false),
+                    new FilterOption("110", "sobrevivencia", false),
+                    new FilterOption("109", "torre", false),
+                    new FilterOption("298", "vídeo game", false),
+                ],
+                AllowMultiple: true
+            ),
+        ];
 
     public IReadOnlyDictionary<string, string> Languages =>
         _languages ??= new Dictionary<string, string> { { "pt-BR", "Português (BR)" } };
@@ -270,9 +383,8 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
     private static string ToQueryString(Dictionary<string, string[]> source) =>
         string.Join(
             "&",
-            source.SelectMany(kvp =>
-                kvp.Value.Where(v => !string.IsNullOrEmpty(v))
-                    .Select(v => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(v)}")
+            source.Select(kvp =>
+                $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(string.Join(",", kvp.Value.Where(v => !string.IsNullOrEmpty(v))))}"
             )
         );
 }
