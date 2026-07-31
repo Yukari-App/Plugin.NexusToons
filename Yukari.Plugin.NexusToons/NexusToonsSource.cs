@@ -71,11 +71,38 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
 
     public async Task<byte[]?> GetImageBytesAsync(string imageUrl, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrEmpty(imageUrl))
+            return null;
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
+        AddRequestHeaders(request);
+
+        using var response = await _httpClient!.SendAsync(request, ct);
+
+        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            throw new HttpRequestException(
+                "NexusToons Rate Limit Exceeded. Try again later.",
+                null,
+                HttpStatusCode.TooManyRequests
+            );
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadAsByteArrayAsync(ct);
     }
 
     public ValueTask DisposeAsync()
     {
         return ValueTask.CompletedTask;
+    }
+
+    private static void AddRequestHeaders(HttpRequestMessage request)
+    {
+        request.Headers.Add("Referer", "https://nexustoons.com");
+        request.Headers.Add(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0"
+        );
     }
 }
