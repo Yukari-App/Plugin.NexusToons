@@ -18,6 +18,7 @@ namespace Yukari.Plugin.NexusToons;
 public class NexusToonsSource : IComicSource, IRequiresHttpClient
 {
     private const int DefaultPageSize = 24;
+    private const string SourceLanguage = "pt-BR";
 
     private static IReadOnlyList<Filter>? _filters;
     private static IReadOnlyDictionary<string, string>? _languages;
@@ -25,7 +26,7 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
     public IReadOnlyList<Filter> Filters => _filters ??= [];
 
     public IReadOnlyDictionary<string, string> Languages =>
-        _languages ??= new Dictionary<string, string> { { "pt-br", "Português (BR)" } };
+        _languages ??= new Dictionary<string, string> { { "pt-BR", "Português (BR)" } };
 
     private const string BaseUrl = "https://nexustoons.com/api";
 
@@ -102,7 +103,27 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
 
     public async Task<Comic?> GetDetailsAsync(string comicId, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var slug = DecodeComicId(comicId).Item2;
+        string detailsUrl = $"{BaseUrl}/manga/{slug}";
+
+        var detailsResult = (await GetFromApiAsync<NexusToonsComic>(detailsUrl, ct));
+
+        if (detailsResult is null)
+            return null;
+
+        return new Comic(
+            Id: EncodeComicId(detailsResult.Id, detailsResult.Slug),
+            ComicUrl: $"https://nexustoons.com/manga/{detailsResult.Slug}",
+            Slug: null,
+            Title: detailsResult.Title,
+            Author: !string.IsNullOrWhiteSpace(detailsResult.Author) ? detailsResult.Author : null,
+            Description: detailsResult.Description,
+            Tags: detailsResult.Categories.Select(c => c.Name).ToArray(),
+            Year: detailsResult.Year,
+            CoverImageUrl: detailsResult.CoverUrl,
+            Langs: [SourceLanguage],
+            Status: GetComicStatus(detailsResult.Status)
+        );
     }
 
     public async Task<IReadOnlyList<Chapter>> GetAllChaptersAsync(
