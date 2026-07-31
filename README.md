@@ -48,6 +48,13 @@ Built for the **[Yukari](https://github.com/Yukari-App/Yukari)** Windows reader 
 - **Errors**: Returns empty results instead of crashing on API issues (e.g., invalid ID).
 
 <div align="center">
+  <h2>⚠️ Disclaimer</h2>
+
+This is a **community plugin** and is not affiliated with, endorsed by, or sponsored by NexusToons.  
+Use at your own discretion. The plugin does **not** host or distribute any copyrighted content – it merely provides an interface to access content that is publicly available on the NexusToons website.
+</div>
+
+<div align="center">
     <h2>🤝 Contributing</h2>
   
 Contributions are welcome! You can help improve **Yukari.Plugin.NexusToons** in several ways:
