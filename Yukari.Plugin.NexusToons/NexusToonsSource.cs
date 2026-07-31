@@ -106,7 +106,7 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
         var slug = DecodeComicId(comicId).Item2;
         string detailsUrl = $"{BaseUrl}/manga/{slug}";
 
-        var detailsResult = (await GetFromApiAsync<NexusToonsComic>(detailsUrl, ct));
+        var detailsResult = await GetFromApiAsync<NexusToonsComic>(detailsUrl, ct);
 
         if (detailsResult is null)
             return null;
@@ -132,7 +132,31 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
         CancellationToken ct = default
     )
     {
-        throw new NotImplementedException();
+        var slug = DecodeComicId(comicId).Item2;
+        string chaptersUrl = $"{BaseUrl}/manga/{slug}";
+
+        var chaptersResult = (await GetFromApiAsync<NexusToonsComic>(chaptersUrl, ct))?.Chapters;
+
+        if (chaptersResult is not { Length: > 0 })
+            return Array.Empty<Chapter>();
+
+        // NexusToons returns chapters in descending order (newest first).
+        // Reverse to get chronological order (oldest first).
+        var chapters = chaptersResult
+            .Reverse()
+            .Select(c => new Chapter(
+                Id: c.Id.ToString(),
+                Title: c.Title,
+                Number: c.Number,
+                Volume: null,
+                Language: language,
+                Groups: Array.Empty<string>(),
+                LastUpdate: DateOnly.FromDateTime(c.CreatedAt.DateTime),
+                Pages: null
+            ))
+            .ToList();
+
+        return chapters;
     }
 
     public async Task<IReadOnlyList<ChapterPage>> GetChapterPagesAsync(
