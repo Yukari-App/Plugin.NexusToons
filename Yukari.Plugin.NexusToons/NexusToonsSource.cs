@@ -165,7 +165,20 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
         CancellationToken ct = default
     )
     {
-        throw new NotImplementedException();
+        string pagesUrl = $"{BaseUrl}/chapter/{chapterId}";
+
+        var pagesResult = (await GetFromApiAsync<NexusToonsChapter>(pagesUrl, ct))?.Pages;
+
+        if (pagesResult is not { Length: > 0 })
+            return Array.Empty<ChapterPage>();
+
+        var pages = new List<ChapterPage>(pagesResult.Length);
+        for (int i = 0; i < pagesResult.Length; i++)
+        {
+            pages.Add(new ChapterPage(Number: i + 1, ImageUrl: pagesResult[i].ImageUrl));
+        }
+
+        return pages;
     }
 
     public async Task<byte[]?> GetImageBytesAsync(string imageUrl, CancellationToken ct = default)
@@ -236,11 +249,11 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
         );
     }
 
-    private static string EncodeComicId(int id, string slug) => $"{id}:{slug}";
+    private static string EncodeComicId(int id, string slug) => $"{id}%{slug}";
 
     private static (string, string) DecodeComicId(string encodedId)
     {
-        var splitted = encodedId.Split(":");
+        var splitted = encodedId.Split("%");
         return (splitted[0], splitted[1]);
     }
 
