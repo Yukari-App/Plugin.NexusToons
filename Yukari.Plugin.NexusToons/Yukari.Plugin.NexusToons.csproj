@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <AssemblyName>Yukari.Plugin.NexusToons</AssemblyName>
+    <RootNamespace>Yukari.Plugin.NexusToons</RootNamespace>
+
+    <Version>0.1.0-Alpha+core2.4.0</Version>
+    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <AssemblyFileVersion>$(AssemblyVersion)</AssemblyFileVersion>
+    <AssemblyInformationalVersion>$(Version)</AssemblyInformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
+    <AssemblyTitle>Yukari NexusToons Plugin</AssemblyTitle>
+    <AssemblyProduct>Yukari</AssemblyProduct>
+    <Description>NexusToons comic source plugin for Yukari.</Description>
+    <Copyright>Copyright © TXG0Fk3. Licensed under GPL-3.0.</Copyright>
+    <AssemblyCopyright>Copyright © TXG0Fk3. Licensed under GPL-3.0.</AssemblyCopyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Yukari.Core" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+</Project>
