@@ -1,6 +1,9 @@
 using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Yukari.Core.Models;
 using Yukari.Core.Sources;
+using Yukari.Plugin.NexusToons.Helpers;
 
 namespace Yukari.Plugin.NexusToons;
 
@@ -24,6 +27,13 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
     private const string BaseUrl = "https://nexustoons.com/api";
 
     private ISharedHttpClient? _httpClient;
+    private OrionCrypto _orionCrypto = new();
+
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString,
+    };
 
     public void SetHttpClient(ISharedHttpClient httpClient) => _httpClient = httpClient;
 
@@ -95,6 +105,37 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
     public ValueTask DisposeAsync()
     {
         return ValueTask.CompletedTask;
+    }
+
+    private async Task<T?> GetFromApiAsync<T>(string url, CancellationToken ct = default)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        AddRequestHeaders(request);
+
+        using var response = await _httpClient!.SendAsync(request, ct);
+
+        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            throw new HttpRequestException(
+                "NexusToons Rate Limit Exceeded. Try again later.",
+                null,
+                HttpStatusCode.TooManyRequests
+            );
+
+        if (response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound)
+            return default;
+
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync(ct);
+
+        using var doc = JsonDocument.Parse(content);
+        var root = doc.RootElement;
+
+        string jsonToDeserialize = content;
+
+        if (_orionCrypto.IsEncryptedResponse(root))
+            jsonToDeserialize = _orionCrypto.ProcessResponse(doc);
+
+        return JsonSerializer.Deserialize<T>(jsonToDeserialize, _jsonOptions);
     }
 
     private static void AddRequestHeaders(HttpRequestMessage request)
