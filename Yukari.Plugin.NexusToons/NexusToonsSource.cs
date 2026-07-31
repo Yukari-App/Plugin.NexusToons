@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Yukari.Core.Models;
 using Yukari.Core.Sources;
+using Yukari.Plugin.NexusToons.Data;
 using Yukari.Plugin.NexusToons.Helpers;
 
 namespace Yukari.Plugin.NexusToons;
@@ -16,6 +17,8 @@ namespace Yukari.Plugin.NexusToons;
 )]
 public class NexusToonsSource : IComicSource, IRequiresHttpClient
 {
+    private const int DefaultPageSize = 24;
+
     private static IReadOnlyList<Filter>? _filters;
     private static IReadOnlyDictionary<string, string>? _languages;
 
@@ -44,7 +47,42 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
         CancellationToken ct = default
     )
     {
-        throw new NotImplementedException();
+        var queryParams = new Dictionary<string, string[]>
+        {
+            ["page"] = [page.ToString()],
+            ["limit"] = [DefaultPageSize.ToString()],
+            ["search"] = [query],
+        };
+
+        foreach (var kvp in filters)
+            queryParams[kvp.Key] = kvp.Value.ToArray();
+
+        string searchUrl = $"{BaseUrl}/mangas?{ToQueryString(queryParams)}";
+
+        var searchResults = (await GetFromApiAsync<SearchResponse>(searchUrl, ct))?.Comics;
+
+        if (searchResults is not { Length: > 0 })
+            return Array.Empty<Comic>();
+
+        var comics = searchResults
+            .Select(result =>
+            {
+                return new Comic(
+                    Id: result.Id.ToString(),
+                    ComicUrl: null,
+                    Slug: null,
+                    Title: result.Title,
+                    Author: null,
+                    Description: null,
+                    Tags: [],
+                    Year: null,
+                    CoverImageUrl: result.CoverUrl,
+                    Langs: []
+                );
+            })
+            .ToList();
+
+        return comics;
     }
 
     public async Task<IReadOnlyList<Comic>> GetTrendingAsync(
@@ -146,4 +184,13 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0"
         );
     }
+
+    private static string ToQueryString(Dictionary<string, string[]> source) =>
+        string.Join(
+            "&",
+            source.SelectMany(kvp =>
+                kvp.Value.Where(v => !string.IsNullOrEmpty(v))
+                    .Select(v => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(v)}")
+            )
+        );
 }
