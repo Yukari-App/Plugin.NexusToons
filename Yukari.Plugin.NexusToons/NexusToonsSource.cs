@@ -231,7 +231,7 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
             Title: detailsResult.Title,
             Author: !string.IsNullOrWhiteSpace(detailsResult.Author) ? detailsResult.Author : null,
             Description: detailsResult.Description,
-            Tags: detailsResult.Categories.Select(c => c.Name).ToArray(),
+            Tags: detailsResult.Categories?.Select(c => c.Name).ToArray() ?? [],
             Year: detailsResult.Year,
             CoverImageUrl: detailsResult.CoverUrl,
             Langs: [SourceLanguage],
