@@ -9,8 +9,8 @@
     <AssemblyName>Yukari.Plugin.NexusToons</AssemblyName>
     <RootNamespace>Yukari.Plugin.NexusToons</RootNamespace>
 
-    <Version>1.0.1+core2.4.0</Version>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <Version>1.1.0+core2.5.0</Version>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
     <AssemblyFileVersion>$(AssemblyVersion)</AssemblyFileVersion>
     <AssemblyInformationalVersion>$(Version)</AssemblyInformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
