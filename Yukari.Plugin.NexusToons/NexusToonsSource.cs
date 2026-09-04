@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Yukari.Core.Models;
 using Yukari.Core.Sources;
+using Yukari.Core.Sources.Http;
 using Yukari.Plugin.NexusToons.Data;
 using Yukari.Plugin.NexusToons.Helpers;
 
@@ -184,7 +185,6 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
                 return new Comic(
                     Id: EncodeComicId(result.Id, result.Slug),
                     ComicUrl: null,
-                    Slug: null,
                     Title: result.Title,
                     Author: null,
                     Description: null,
@@ -227,7 +227,6 @@ public class NexusToonsSource : IComicSource, IRequiresHttpClient
         return new Comic(
             Id: EncodeComicId(detailsResult.Id, detailsResult.Slug),
             ComicUrl: $"https://nexustoons.com/manga/{detailsResult.Slug}",
-            Slug: null,
             Title: detailsResult.Title,
             Author: !string.IsNullOrWhiteSpace(detailsResult.Author) ? detailsResult.Author : null,
             Description: detailsResult.Description,
