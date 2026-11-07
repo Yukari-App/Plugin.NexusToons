@@ -8,7 +8,7 @@ namespace Yukari.Plugin.NexusToons;
 
 [ComicSourceMetadata(
     "NexusToons",
-    "1.1.0+core2.5.0",
+    "1.2.0+core2.6.0",
     "https://github.com/Yukari-App/Plugin.NexusToons/releases",
     "https://nexustoons.com/icon.png",
     "Acesse gratuitamente milhares de Mangás, Manhwas, Webtoons... em Português!"
